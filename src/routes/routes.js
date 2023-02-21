@@ -68,7 +68,7 @@ const routes = createBrowserRouter([
         element: <AddJob />,
       },
       {
-        path: "employer",
+        path: "employee",
         element: <EmployerDashboard />,
       },
       {
