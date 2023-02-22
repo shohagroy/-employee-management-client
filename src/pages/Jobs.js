@@ -1,13 +1,9 @@
 import React from "react";
 import JobCard from "../components/reusable/JobCard";
-import { useGetJobByIdQuery, useGetJobsQuery } from "../features/jobs/jobApi";
+import { useGetJobsQuery } from "../features/jobs/jobApi";
 
 const Jobs = () => {
-  const { data, isLoading, isError } = useGetJobsQuery();
-
-  const { data: job } = useGetJobByIdQuery("63f393d06071fff48a821f64");
-
-  console.log(job);
+  const { data, isLoading } = useGetJobsQuery();
 
   if (isLoading) {
     return <h2 className="text-center font-2xl font-bold">Loading...</h2>;

@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { FaChevronLeft } from "react-icons/fa";
 import { useRegisterMutation } from "../../features/authSlice/authApi";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 
 const CandidateRegistration = () => {
+  const { user } = useSelector((state) => state.auth);
   const [postUser] = useRegisterMutation();
   const [countries, setCountries] = useState([]);
   const { handleSubmit, register, control, reset } = useForm();
@@ -21,7 +23,6 @@ const CandidateRegistration = () => {
   const onSubmit = (data) => {
     postUser({ ...data, role: "candidate" });
     reset();
-    console.log(data);
     toast.success("Registration Successful!");
     navigate("/");
   };
@@ -57,7 +58,12 @@ const CandidateRegistration = () => {
             <label className="mb-2" htmlFor="email">
               Email
             </label>
-            <input type="email" id="email" {...register("email")} />
+            <input
+              value={user.email}
+              type="email"
+              id="email"
+              {...register("email")}
+            />
           </div>
           <div className="flex flex-col w-full max-w-xs">
             <h1 className="mb-3">Gender</h1>

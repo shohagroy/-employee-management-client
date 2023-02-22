@@ -27,7 +27,6 @@ const AddJob = () => {
   } = useFieldArray({ control, name: "requirements" });
 
   const onSubmit = (data) => {
-    console.log(data);
     const openJob = {
       ...data,
       applicants: [],

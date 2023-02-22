@@ -82,7 +82,7 @@ const authSlice = createSlice({
       .addCase(createUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
-        state.user.email = action.payload;
+        state.user = { ...state.user, email: action.payload };
         state.error = "";
       })
       .addCase(createUser.rejected, (state, action) => {

@@ -1,7 +1,7 @@
 import React from "react";
-import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import swal from "sweetalert";
 import {
   useAppliedJobsQuery,
   useCancelApplyMutation,
@@ -11,19 +11,28 @@ const CandidateDashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const { data } = useAppliedJobsQuery(user?.email);
 
-  const [cancelApply, { isLoading, isError }] = useCancelApplyMutation();
-
-  console.log(data);
+  const [cancelApply] = useCancelApplyMutation();
 
   const cancelJobHandelar = (id) => {
     const data = { jobId: id, userId: user?._id, email: user.email };
 
-    cancelApply(data).then((res) => {
-      if (res.status) {
-        toast.success("Applied Job Cancel SuccessFull!");
+    swal({
+      title: "Are you sure?",
+      text: "Cancel This Apply!",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        cancelApply(data).then((res) => {
+          if (res?.data?.status) {
+            swal("Cancel Apply Successfull!", {
+              icon: "success",
+            });
+          }
+        });
       }
     });
-    console.log(data);
   };
 
   return (

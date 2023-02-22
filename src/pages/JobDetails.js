@@ -5,18 +5,21 @@ import { BsArrowRightShort, BsArrowReturnRight } from "react-icons/bs";
 import {
   useApplyJobMutation,
   useGetJobByIdQuery,
+  useQuestionJobsMutation,
+  useReplyQuestionMutation,
 } from "../features/jobs/jobApi";
 import { useParams } from "react-router-dom";
 import Loading from "../components/reusable/Loading";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+
 const JobDetails = () => {
   const { id } = useParams();
-  const { data, isLoading } = useGetJobByIdQuery(id);
+  const { data, isLoading } = useGetJobByIdQuery(id, { pollingInterval: 3000 });
+  const [questionJobs] = useQuestionJobsMutation();
   const { user } = useSelector((state) => state.auth);
   const [applyJob, { isLoading: loading }] = useApplyJobMutation();
-
-  console.log(data?.data);
+  const [replyQuestion] = useReplyQuestionMutation();
 
   if (isLoading) {
     return <Loading />;
@@ -53,6 +56,36 @@ const JobDetails = () => {
     } else {
       toast.error("You Need to Candidate Account for Job Apply!");
     }
+  };
+
+  const questionHandelar = (e) => {
+    e.preventDefault();
+
+    const question = e.target.question.value;
+    const data = {
+      question,
+      jobId: _id,
+      email: user.email,
+      userId: user._id,
+      userName: user.firstName + " " + user.lastName,
+    };
+
+    questionJobs(data).then((res) => {
+      if (res.data.status) {
+        e.target.question.value = "";
+      }
+    });
+  };
+
+  const questionReplyHandelar = (e, id) => {
+    e.preventDefault();
+    const reply = e.target.reply.value;
+    const data = { userId: id, reply };
+    replyQuestion(data).then((res) => {
+      if (res.data.status) {
+        e.target.reply.value = "";
+      }
+    });
   };
 
   return (
@@ -121,10 +154,11 @@ const JobDetails = () => {
             <h1 className="text-xl font-semibold text-primary mb-5">
               General Q&A
             </h1>
+
             <div className="text-primary my-2">
-              {queries?.map(({ question, email, reply, id }) => (
-                <div key={id}>
-                  <small>{email}</small>
+              {queries?.map(({ question, userName, reply, id }) => (
+                <div key={question} className="leading-none">
+                  <small>{userName}</small>
                   <p className="text-lg font-medium">{question}</p>
                   {reply?.map((item) => (
                     <p
@@ -135,30 +169,42 @@ const JobDetails = () => {
                     </p>
                   ))}
 
-                  <div className="flex gap-3 my-5">
-                    <input placeholder="Reply" type="text" className="w-full" />
-                    <button
-                      className="shrink-0 h-14 w-14 bg-primary/10 border border-primary hover:bg-primary rounded-full transition-all  grid place-items-center text-primary hover:text-white"
-                      type="button"
-                    >
-                      <BsArrowRightShort size={30} />
-                    </button>
-                  </div>
+                  {user?.role === "employer" && (
+                    <form onSubmit={(e) => questionReplyHandelar(e, id)}>
+                      <div className="flex gap-3 my-5">
+                        <input
+                          placeholder="Reply"
+                          type="text"
+                          className="w-full"
+                          required
+                          name="reply"
+                        />
+                        <button
+                          className="shrink-0 h-14 w-14 bg-primary/10 border border-primary hover:bg-primary rounded-full transition-all  grid place-items-center text-primary hover:text-white"
+                          type="submit"
+                        >
+                          <BsArrowRightShort size={30} />
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </div>
               ))}
             </div>
 
             {user.role === "candidate" && (
-              <form>
+              <form onSubmit={(e) => questionHandelar(e)}>
                 <div className="flex gap-3 my-5">
                   <input
+                    required
                     placeholder="Ask a question..."
                     type="text"
+                    name="question"
                     className="w-full"
                   />
                   <button
                     className="shrink-0 h-14 w-14 bg-primary/10 border border-primary hover:bg-primary rounded-full transition-all  grid place-items-center text-primary hover:text-white"
-                    type="button"
+                    type="submit"
                   >
                     <BsArrowRightShort size={30} />
                   </button>
