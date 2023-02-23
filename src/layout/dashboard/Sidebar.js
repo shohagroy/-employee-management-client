@@ -45,6 +45,14 @@ const Sidebar = () => {
             </Link>
           </li>
         )}
+        <li>
+          <Link
+            className="hover:bg-primary hover:text-white bg-primary/10 transition-all w-full block py-2 px-3 rounded-full"
+            to="candidate"
+          >
+            My Profile
+          </Link>
+        </li>
       </ul>
     </div>
   );

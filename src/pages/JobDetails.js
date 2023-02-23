@@ -39,6 +39,7 @@ const JobDetails = () => {
     queries,
     _id,
     applicants,
+    authorEmail,
   } = data.data;
 
   const handelApply = () => {
@@ -47,6 +48,9 @@ const JobDetails = () => {
         jobId: _id,
         email: user?.email,
         userId: user._id,
+        user: user.firstName + " " + user.lastName,
+        authorEmail,
+        position,
       };
       applyJob(data).then((res) => {
         if (res.data.data.modifiedCount) {

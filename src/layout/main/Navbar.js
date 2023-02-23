@@ -1,15 +1,23 @@
 import { signOut } from "firebase/auth";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../features/authSlice/authSlice";
 
 import { Link, useLocation } from "react-router-dom";
 import auth from "../../firebase.config";
+import NotificationMessage from "./NotificationMessage";
+import NotificationContainer from "./NotificationContainer";
+import MassegeContainer from "./MassegeContainer";
+import { useGetNotificationQuery } from "../../features/NotificationMessage/notifyApi";
+import { getNotifications } from "../../features/NotificationMessage/NotificationMessageSlice";
 
 const Navbar = () => {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const {
+    auth: { user },
+    getNotify,
+  } = useSelector((state) => state);
 
   let dashbord;
 
@@ -29,6 +37,16 @@ const Navbar = () => {
       });
   };
 
+  const { data } = useGetNotificationQuery(user?.email, {
+    pollingInterval: 2000,
+  });
+
+  useEffect(() => {
+    if (data?.status) {
+      dispatch(getNotifications(data?.data));
+    }
+  }, [data, dispatch]);
+
   return (
     <nav
       className={`h-14 fixed w-full z-[999] ${
@@ -44,7 +62,6 @@ const Navbar = () => {
             Jobs
           </Link>
         </li>
-
         <li>
           {user?.email ? (
             <button
@@ -74,6 +91,7 @@ const Navbar = () => {
             </Link>
           )}
         </li>
+        {user?.email && user?.role && <NotificationMessage />}
         <li>
           {user?.email && !user?.role && (
             <Link
@@ -85,6 +103,21 @@ const Navbar = () => {
           )}
         </li>
       </ul>
+
+      {getNotify.openNotification && (
+        <div
+          className={`absolute  z-50 right-0 bg-white  md:w-[420px] duration-300 h-screen shadow-2xl `}
+        >
+          <NotificationContainer />
+        </div>
+      )}
+      {getNotify.openMassege && (
+        <div
+          className={`absolute  z-50 right-0 bg-white  md:w-[420px] duration-300 h-screen shadow-2xl  `}
+        >
+          <MassegeContainer />
+        </div>
+      )}
     </nav>
   );
 };

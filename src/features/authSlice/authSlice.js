@@ -11,7 +11,7 @@ const initialState = {
     email: "",
     role: "",
   },
-  isLoading: false,
+  isLoading: true,
   isError: false,
   error: "",
 };
@@ -100,7 +100,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
-        state.user.email = action.payload;
+        state.user = { email: action.payload };
         state.error = "";
       })
       .addCase(loginUser.rejected, (state, action) => {
